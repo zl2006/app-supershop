@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>    
+<!DOCTYPE mapper    
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"    
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="demo">
+	<resultMap type="TA-DEMO" id="RM-DEMO">
+		<result property="demoID" column="DEMO_ID" />
+		<result property="name" column="NAME" />
+		<result property="createTime" column="CREATE_TIME" />
+		<result property="updateTime" column="UPDATE_TIME" />
+		<result property="createPerson" column="CREATE_PERSON" />
+		<result property="updatePerson" column="UPDATE_PERSON" />
+	</resultMap>
+	
+	<sql id="SQL_SELECT_DEMO">
+		<![CDATA[
+	        SELECT
+				a.DEMO_ID,
+   				a.NAME,
+				a.CREATE_TIME,
+   				a.UPDATE_TIME
+   				a.CREATE_PERSON,
+   				a.UPDATE_PERSON
+	        FROM TB_SHOP_DEMO a
+	   ]]>
+	</sql>
+	
+	<sql id="SQL_WHERE_DEMO">
+		<if test="demoID != null">
+			AND a.DEMO_ID = #{demoID}
+		</if>
+		<if test="name != null and name != ''">
+			AND a.NAME = #{name}
+		</if>
+	</sql>
+	
+	
+	<!--************************************************************************************************************************* -->
+	<!-- 新增 -->
+	<insert id="INSERT_DEMO" parameterType="TA-DEMO">
+		INSERT INTO TB_SHOP_DEMO (DEMO_ID , NAME, CREATE_TIME, UPDATE_TIME, CREATE_PERSON, UPDATE_PERSON)
+		values
+			(#{demoID}, #{name}, #{CREATE_TIME}, #{UPDATE_TIME}, #{CREATE_PERSON}, #{UPDATE_PERSON})
+		<selectKey resultType="long" keyProperty="demoID">
+			SELECT LAST_INSERT_ID() AS DEMO_ID
+		</selectKey>
+	</insert>
+	
+	<!-- 删除 -->
+	<delete id="DELETE_DEMO" parameterType="java.lang.Long">
+		DELETE FROM TB_SHOP_DEMO WHERE DEMO_ID = #{value}
+	</delete>
+	
+	<!-- 获取 -->
+	<select id="FIND_DEMO_BY_ID" parameterType="java.lang.Long" resultMap="RM-DEMO">
+		<include refid="SQL_SELECT_DEMO" /> WHERE a.DEMO_ID = #{value}
+	</select>
+	
+</mapper>

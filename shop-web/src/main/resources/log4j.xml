@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+
+<log4j:configuration xmlns:log4j='http://jakarta.apache.org/log4j/'>
+
+	<!-- 控制台日志输入管道 -->
+	<appender name="myConsole" class="org.apache.log4j.ConsoleAppender">
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="[%d{dd HH:mm:ss,SSS\} %-5p] [%t] %c{2\} - %m%n" />
+		</layout>
+		<!--过滤器设置输出的级别 -->
+		<filter class="org.apache.log4j.varia.LevelRangeFilter">
+			<param name="levelMin" value="debug" />
+			<param name="levelMax" value="error" />
+			<param name="AcceptOnMatch" value="true" />
+		</filter>
+	</appender>
+	<!-- end -->
+
+
+
+	<!-- 性能日志文件配置 -->
+	<!-- 文件输出管道，把汇总的perf4j的日志信息写到perfStats.log文件中去 -->
+	<appender name="fileAppender" class="org.apache.log4j.FileAppender">
+		<param name="File" value="/tmp/user/user-perfStats.log" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%m%n" />
+		</layout>
+	</appender>
+	<!-- TimeSlice配置多少时间间隔去做一次汇总写入文件中 默认值是 30000 ms -->
+	<appender name="CoalescingStatistics"
+		class="org.perf4j.log4j.AsyncCoalescingStatisticsAppender">
+		<param name="TimeSlice" value="10000" />
+		<appender-ref ref="fileAppender" />
+	</appender>
+	<!-- Loggers -->
+	<!-- 配置perf4j logger Additivity设置成false主要因为是不想让代码运行时间的日志输出给上游appenders，即不要在控制台输出。 -->
+	<logger name="org.perf4j.TimingLogger" additivity="false">
+		<level value="INFO" />
+		<appender-ref ref="CoalescingStatistics" />
+	</logger>
+	<!-- end -->
+
+
+
+
+	<!-- 文件输出输入日志配置 -->
+	<appender name="myFile" class="org.apache.log4j.RollingFileAppender">
+		<param name="File" value="/tmp/user/user.log" />
+		<param name="Append" value="true" />
+		<param name="MaxBackupIndex" value="10" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%p (%c:%L)- %m%n" />
+		</layout>
+	</appender>
+	<!-- appender name="activexAppender" class="org.apache.log4j.DailyRollingFileAppender"> 
+		<param name="File" value="E:/activex.log" /> <param name="DatePattern" value="'.'yyyy-MM-dd'.log'" 
+		/> <layout class="org.apache.log4j.PatternLayout"> <param name="ConversionPattern" 
+		value="[%d{MMdd HH:mm:ss SSS\} %-5p] [%t] %c{3\} - %m%n" /> </layout> </appender> 
+		<logger name="com.runway.bssp.activeXdemo" additivity="false"> <priority 
+		value="info" /> <appender-ref ref="activexAppender" /> </logger> -->
+
+
+	<!-- 数据库调试日志，通过指定包或具体的类实现 -->
+	<logger name="com.ibatis">
+		<level value="debug" />
+	</logger>
+	<logger name="com.ibatis.common.jdbc.SimpleDataSource">
+		<level value="debug" />
+	</logger>
+	<logger name="com.ibatis.common.jdbc.ScriptRunner">
+		<level value="debug" />
+	</logger>
+	<logger name="com.ibatis.common.jdbc.SqlMapClientDelegate">
+		<level value="debug" />
+	</logger>
+	<logger name="java.sql.Connection">
+		<level value="debug" />
+	</logger>
+	<logger name="java.sql.Statement">
+		<level value="debug" />
+	</logger>
+	<logger name="java.sql.PreparedStatement">
+		<level value="debug" />
+	</logger>
+	<logger name="java.sql.ResultSet">
+		<level value="debug" />
+	</logger>
+	<!-- end -->
+
+
+	<!-- 为单独的类或包指定日志配置 -->
+	<logger name="com.tydic.simple.dao.user.impl">
+		<level value="info" />
+		<appender-ref ref="myConsole" />
+	</logger>
+	<!-- end -->
+
+
+	<!-- 根logger的设置 ，默认所有的日志配置 -->
+	<root>
+		<priority value="debug" />
+		<appender-ref ref="myConsole" />
+		<!-- appender-ref ref="myFile" / -->
+	</root>
+	<!-- end -->
+
+</log4j:configuration>
